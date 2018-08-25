@@ -142,8 +142,10 @@ public final class Query {
 
             JSONArray newsArray = response.getJSONArray("results");
 
+            final int numberOfItemsInResp = newsArray.length();
+
             // For each news in the newsArray, create an object
-            for (int i = 0; i < newsArray.length(); i++) {
+            for (int i = 0; i < numberOfItemsInResp; i++) {
 
                 // Get a single news at position i within the list of news
                 JSONObject currentNews = newsArray.getJSONObject(i);
