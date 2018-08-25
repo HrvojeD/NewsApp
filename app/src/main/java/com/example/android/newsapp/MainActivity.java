@@ -21,7 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>> {
 
     private static final String GUARDIAN_URL =
-            "https://content.guardianapis.com/search?q=environment&api-key=430f94ba-0842-42c6-98de-1b7b0a164143";
+            "https://content.guardianapis.com/search?show-tags=contributor&api-key=430f94ba-0842-42c6-98de-1b7b0a164143";
 
     /**
      * Adapter for the list of news

@@ -26,6 +26,10 @@ public final class Query {
      */
     private static final String LOG_TAG = Query.class.getSimpleName();
 
+    private static final int SUCCESS_CODE = 200;
+    private static final int readTimeout = 10000;
+    private static final int connectTimeout = 15000;
+
     //empty private constructor
     private Query() {
     }
@@ -77,14 +81,14 @@ public final class Query {
         InputStream inputStream = null;
         try {
             urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(readTimeout /* milliseconds */);
+            urlConnection.setConnectTimeout(connectTimeout /* milliseconds */);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
-            if (urlConnection.getResponseCode() == 200) {
+            if (urlConnection.getResponseCode() == SUCCESS_CODE) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {
@@ -156,9 +160,13 @@ public final class Query {
                 // Extract the value for url
                 String url = currentNews.getString("webUrl");
 
+                JSONArray tagsArray = currentNews.getJSONArray("tags");
+                JSONObject elementInArray = tagsArray.getJSONObject(0);
+                String contributor = elementInArray.getString("webTitle");
+
                 // Create a new {@link News} object with the section, time, title,
                 // and url from the JSON response.
-                News news1 = new News(section, time, title, url);
+                News news1 = new News(section, time, title,contributor, url);
 
                 // Add the new news1 to the list of news.
                 news.add(news1);

@@ -11,14 +11,17 @@ public class News {
     //news title
     private String mTitle;
 
+    private String mContributor;
+
     //website url of the news
     private String mUrl;
 
     //constructor
-    News(String section, String time, String title, String url) {
+    News(String section, String time, String title, String contributor, String url) {
         mSection = section;
         mTime = time;
         mTitle = title;
+        mContributor = contributor;
         mUrl = url;
     }
 
@@ -35,6 +38,11 @@ public class News {
     //get news title
     public String getTitle() {
         return mTitle;
+    }
+
+    //get contributors name
+    public String getContributor() {
+        return mContributor;
     }
 
     public String getUrl() {
