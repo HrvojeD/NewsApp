@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">NewsApp</string>
     <string name="no_news">No news found, please try again later!</string>
-    <string name="no_internet_connection">No internet connection :( Check your internet connection and try again.</string>
+    <string name="no_internet_connection"> No internet connection :( Check your internet connection and try again.</string>
+
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">News Settings</string>
+
+    <string name="settings_order_by_label">Order By</string>
+    <string name="settings_order_by_key" translatable="false">order_by</string>
+    <string name="settings_order_by_default" translatable="false">@string/settings_order_by_newest_value</string>
+
+    <string name="settings_order_by_newest_label">Newest</string>
+    <string name="settings_order_by_newest_value" translatable="false">Newest</string>
+
+    <string name="settings_order_by_oldest_label">Oldest</string>
+    <string name="settings_order_by_oldest_value" translatable="false">Oldest</string>
+
+
 </resources>
