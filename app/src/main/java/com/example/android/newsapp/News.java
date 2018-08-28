@@ -25,6 +25,14 @@ public class News {
         mUrl = url;
     }
 
+    //constructor without contributor
+    News(String section, String time, String title, String url) {
+        mSection = section;
+        mTime = time;
+        mTitle = title;
+        mUrl = url;
+    }
+
     //get name of the section
     public String getSection() {
         return mSection;

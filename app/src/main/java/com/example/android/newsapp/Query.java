@@ -162,16 +162,21 @@ public final class Query {
                 // Extract the value for url
                 String url = currentNews.getString("webUrl");
 
-                JSONArray tagsArray = currentNews.getJSONArray("tags");
-                JSONObject elementInArray = tagsArray.getJSONObject(0);
-                String contributor = elementInArray.getString("webTitle");
+                if (currentNews.has("tags")) {
+                    JSONArray tagsArray = currentNews.getJSONArray("tags");
 
-                // Create a new {@link News} object with the section, time, title,
-                // and url from the JSON response.
-                News news1 = new News(section, time, title,contributor, url);
+                    JSONObject elementInArray = tagsArray.getJSONObject(0);
+                    String contributor = elementInArray.getString("webTitle");
 
-                // Add the new news1 to the list of news.
-                news.add(news1);
+                    News news1 = new News(section, time, title, contributor, url);
+                    news.add(news1);
+                } else {
+
+                    News news1 = new News(section, time, title, url);
+                    news.add(news1);
+                }
+
+
             }
 
         } catch (JSONException e) {

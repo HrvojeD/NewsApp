@@ -37,24 +37,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private TextView mEmptyStateTextView;
 
-    @Override
-    // This method initialize the contents of the Activity's options menu.
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the Options Menu we specified in XML
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent settingsIntent = new Intent(this, SettingsActivity.class);
-            startActivity(settingsIntent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +46,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Find a reference to the {@link ListView} in the layout
         ListView newsListView = (ListView) findViewById(R.id.list);
 
+        // Create a new adapter that takes an empty list of news as input
+        mAdapter = new NewsAdapter(this, new ArrayList<News>());
+
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         newsListView.setEmptyView(mEmptyStateTextView);
+
+        // Set the adapter on the {@link ListView}
+        // so the list can be populated in the user interface
+        newsListView.setAdapter(mAdapter);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
+        newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // Find the current earthquake that was clicked on
+                News currentNews = mAdapter.getItem(position);
+
+                // Convert the String URL into a URI object (to pass into the Intent constructor)
+                Uri newsUri = Uri.parse(currentNews.getUrl());
+
+                // Create a new intent to view the earthquake URI
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsUri);
+
+                // Send the intent to launch a new activity
+                startActivity(websiteIntent);
+            }
+        });
 
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
@@ -86,39 +95,39 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             mEmptyStateTextView.setText(R.string.no_internet_connection);
         }
+    }
 
-        // Create a new adapter that takes an empty list of news as input
-        mAdapter = new NewsAdapter(this, new ArrayList<News>());
+    @Override
+    // This method initialize the contents of the Activity's options menu.
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the Options Menu we specified in XML
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
 
-        // Set the adapter on the {@link ListView}
-        // so the list can be populated in the user interface
-        newsListView.setAdapter(mAdapter);
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.settings_order_by_key))) {
 
+            mAdapter.clear();
 
-        newsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // Find the current earthquake that was clicked on
-                News currentNews = mAdapter.getItem(position);
+            mEmptyStateTextView.setVisibility(View.GONE);
 
-                // Convert the String URL into a URI object (to pass into the Intent constructor)
-                Uri newsUri = Uri.parse(currentNews.getUrl());
+            View loadingIndicator = findViewById(R.id.loading_spinner);
+            loadingIndicator.setVisibility(View.VISIBLE);
 
-                // Create a new intent to view the earthquake URI
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsUri);
-
-                // Send the intent to launch a new activity
-                startActivity(websiteIntent);
-            }
-        });
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
 
+        String numberOfResults = getString(R.string.numberOfResults);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String orderBy  = sharedPreferences.getString(getString(R.string.settings_order_by_key),getString(R.string.settings_order_by_default));
+        String orderBy = sharedPreferences.getString(getString(R.string.settings_order_by_key), getString(R.string.settings_order_by_default));
 
         // parse breaks apart the URI string that's passed into its parameter
         Uri baseUri = Uri.parse(GUARDIAN_URL);
@@ -129,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Append query parameter and its value
         uriBuilder.appendQueryParameter("show-tags", "contributor");
         uriBuilder.appendQueryParameter("api-key", "430f94ba-0842-42c6-98de-1b7b0a164143");
-        uriBuilder.appendQueryParameter("orderby", orderBy);
+        uriBuilder.appendQueryParameter("order-by", orderBy);
+        uriBuilder.appendQueryParameter("page-size", numberOfResults);
 
         // Return the completed uri `http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=10&minmag=minMagnitude&orderby=time
         return new NewsLoader(this, uriBuilder.toString());
@@ -156,17 +166,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.settings_order_by_key))){
-
-            mAdapter.clear();
-
-            mEmptyStateTextView.setVisibility(View.GONE);
-
-            View loadingIndicator = findViewById(R.id.loading_spinner);
-            loadingIndicator.setVisibility(View.VISIBLE);
-
-            getLoaderManager().restartLoader(0, null, this);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+
 }
+
+
